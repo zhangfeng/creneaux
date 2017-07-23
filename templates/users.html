@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block menu %}
+<ul>
+	<li><a href="{{ url_for('sessionsList') }}">S&eacute;ances</a></li>
+{% if admin %}
+	<li>Utilisateurs</li>
+{% endif %}
+</ul>
+{% endblock %}
+
+{% block content %}
+<p>Bonjour {{ session.username }}, <a href="{{ url_for("logout") }}">Se d&eacute;connecter</a></p>
+
+<H1>Nouvel utilisateur</H1>
+<form action="{{ url_for('usersAdd') }}" method="POST" name="create_form">
+	<p>Nom: <input type=text name="username" /></p>
+	<p>Mot de passe: <input type=text name="userpasswd" /></p>
+	<p>Email: <input type=text name="useremail" /></p>
+	<p>Role: <select name="role">
+			{% for r in roles.items() %}
+				<option value="{{ r[0] }}"{% if r[0] == 1 %} selected{% endif %}>{{ r[1] }}</option>
+			{% endfor %}
+			</select>
+	</p>
+	<p><input type=submit name="add" value="Ajouter"/></p>
+</form>
+
+<h1>Utilisateurs</h1>
+
+<dl>
+{% for u in users.values()|sort(attribute='name') %}
+<dt>{{ u.name }}</dt>
+<dd><form action="{{ url_for('usersModify') }}" method="POST">
+		<input type="hidden" name="id" value="{{ u.id }}"/>
+		<ul>
+			<li>Email: <input type="text" name="useremail" value="{{ u.email }}"/></li>
+			<li>Nouveau mot de passe: <input type="password" name="userpassword" /></li>
+			<li>Role: <select name="role">
+			{% for r in roles.items() %}
+				<option value="{{ r[0] }}"{% if r[0] == u.role %} selected{% endif %}>{{ r[1] }}</option>
+			{% endfor %}
+			</select></li>
+		</ul>
+		<p><input type=submit name="action" value="Modifier" /> <input type=submit name="action" value="Absences"/> <input type=submit name="action" value="Presences"/> <input type=submit name="action" value="Supprimer"/></p>
+	</form>
+</dd>
+{% endfor %}
+</dl>
+
+{% endblock %}

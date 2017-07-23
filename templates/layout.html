@@ -1,0 +1,10 @@
+<html><title>{% block title %}Cr&eacute;neaux{% endblock %}</title><body>
+	<div id="title">{{ self.title() }}</div>
+	<div id="menu">{% block menu %}{% endblock %}
+	</div>
+	<div id="main">{% block content %}{% endblock %}</div>
+	<div id="footer">{% block footer %}
+		<p>R&eacute;alis&eacute; avec <a href="http://flask.pocoo.org/">Flask</a></p>
+	{% endblock %}
+	</div>
+</body></html>

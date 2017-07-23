@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block menu %}
+<ul>
+	<li><a href="{{ url_for('sessionsList') }}">S&eacute;ances</a></li>
+{% if admin %}
+	<li>Utilisateurs</li>
+{% else %}
+	<li>Mon compte</li>
+{% endif %}
+</ul>
+{% endblock %}
+
+{% block content %}
+<p>Bonjour {{ session.username }}, <a href="{{ url_for("logout") }}">Se d&eacute;connecter</a></p>
+
+<H1>Mon compte</H1>
+<p><form action="{{ url_for('usersModify') }}" method="POST">
+		<input type="hidden" name="id" value="{{ u.id }}"/>
+		<input type="hidden" name="role" value="{{ u.role }}"/>
+		<ul>
+			<li>Email: <input type="text" name="useremail" value="{{ u.email }}"/></li>
+			<li>Nouveau mot de passe: <input type="password" name="userpassword" /></li>
+		</ul>
+		<p><input type=submit name="action" value="Modifier" /></p>
+	</form>
+</p>
+
+{% endblock %}
+

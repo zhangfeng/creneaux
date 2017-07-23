@@ -1,0 +1,12 @@
+{%- macro url_form(funct, method='POST') -%}
+	<form action="{{ url_for(funct) }}" method="{{ method }}">
+{% endmacro %}
+
+{% macro select(name, list, sel) -%}
+	<select name="{{ name }}">
+		{% for i in list %}
+			<option value="{{ i }}" {% if i == sel %}selected{% endif %}>{{ i }}</option>
+		{% endfor %}
+	</select>
+{%- endmacro %}
+

@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% block menu %}
+<ul>
+	<li>S&eacute;ances</li>
+{% if admin %}
+	<li><a href="{{ url_for('usersList') }}">Utilisateurs</a></li>
+{% else %}
+	<li><a href="{{ url_for("compte") }}">Mon compte</a></li>
+{% endif %}
+</ul>
+{% endblock %}
+
+{% block content %}
+{% import 'forms.html' as forms %}
+<p>Bonjour {{ session.username }}, <a href="{{ url_for("logout") }}">Se d&eacute;connecter</a>
+
+{% if admin %}
+<h2>Ajout d'une s&eacute;ance ou une p&eacute;riode</h2>
+{{ forms.url_form('sessionsSeason') }}
+<p>Du: {{ forms.select('s_day', range(1,32), today.day) }}
+	/ {{ forms.select('s_month', range(1,13), today.month) }}
+	/ {{ forms.select('s_year', range(today.year,today.year+2), today.year) }}
+	au {{ forms.select('e_day', range(1,32), today.day) }}
+	/ {{ forms.select('e_month', range(1,13), today.month) }}
+	/ {{ forms.select('e_year', range(today.year,today.year+2), today.year) }}
+	<input type=submit value="Ajouter" />
+</form>
+{% endif %}
+
+<h1>S&eacute;ances &agrave; venir</h1>
+
+<ul>
+{% for s in creneaux %}
+<li>{{ s.date }}
+	{% if s.alieu %}
+		organis&eacute; par <span>{{ s.org }}</span>, participants <span>{{ s.presents }}</span>
+		{% if s.comments is iterable %}
+			{% for c in s.comments %}
+				<p>{{ c.note|e }}
+				{% if organizer %}
+					<form method="POST" action="{{ url_for('removeNote') }}">
+						<input type=hidden name="cid" value="{{ c.id }}"/>
+						<input type=submit value="Supprimer"/>
+					</form>
+				{% endif %}
+				</p>
+			{% endfor %}
+			{% if organizer %}
+				<form method="post" action="{{ url_for('addNote') }}">
+					<p><input type=text name="note"/>
+						<input type=hidden name="sid" value="{{ s.id }}"/>
+						<input type=submit value="Commenter"/>
+					</p>
+				</form>
+			{% endif %}
+		{% endif %}
+		<p>{% if organizer %}
+			<form action="{{ url_for('sessionsOrganize', sid=s.id) }}" method="POST">
+				<select name="organiseur">
+					{% for u in users %}
+					<option value="{{ u }}" {% if u.title() == s.org.title() %}selected{% endif %}>{{ u }}</li>
+					{% endfor %}
+				</select>
+				<input type=submit name="action" value="organise" />
+			</form>
+		{% elif s.org.title() == 'Personne' and s.presents.find(session['username'].title()) >= 0 %}
+			<a href="{{ url_for('sessionsOrganize', sid=s.id) }}">J'organise</a>
+		{% endif %}</p>
+		{% if s.presents.find(session['username'].title()) >= 0 %}
+			<a href="{{ url_for('sessionsAbsent', sid=s.id) }}">Je n'y serai pas</a>
+		{% else %}
+			<a href="{{ url_for('sessionsPresent', sid=s.id) }}">J'y serai</a>
+		{% endif %}
+		{% if admin %}
+			<a href="{{ url_for('sessionsPresences', sid=s.id) }}">Pr&eacute;sences</a>
+			<a href="{{ url_for('sessionsAnnule', sid=s.id) }}">Annuler</a>
+			<a href="{{ url_for('sessionsSupprime', sid=s.id) }}">Supprimer</a>
+		{% endif %}
+		</p>
+	{% else %}
+		Annul&eacute;e{% if s.note %}: {{ s.note }}{% endif %}
+	{% endif %}
+{% endfor %}
+</ul>
+
+{% endblock %}

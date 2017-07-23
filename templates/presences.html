@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block menu %}
+<ul>
+	<li><a href="{{ url_for('sessionsList') }}">S&eacute;ances</a></li>
+{% if admin %}
+	<li><a href="{{ url_for('usersList') }}">Utilisateurs</a></li>
+{% else %}
+	<li><a href="{{ url_for("compte") }}">Mon compte</a></li>
+{% endif %}
+</ul>
+{% endblock %}
+
+{% block content %}
+<p>Bonjour {{ session.username }}, <a href="{{ url_for("logout") }}">Se d&eacute;connecter</a>
+
+<h1>Pr&eacute;sences &agrave; la s&eacute;ance du {{ seance.date }}</h1>
+
+<form action="{{ url_for('sessionsPresences', sid=seance.id) }}" method="POST">
+<ul>
+{% for u in users|sort %}
+<li><input type=checkbox name="presences" value="{{ u }}" {% if u in presents %}checked{% endif %} /> {{ u }}</li>
+{% endfor %}
+</ul>
+	<p><input type=submit name="update" value="Modifier"/></p>
+</form>
+
+{% endblock %}
+

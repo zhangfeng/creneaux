@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<p><form id="form_login" method="POST" action="login">
+	<p>Utilisateur: <input type="text" name="username" />
+	Mot de passe: <input type="password" name="passwd" />
+	<input type=submit name="action" value="Se connecter" />
+</form>
+</p>
+
+<h1>S&eacute;ances &agrave; venir</h1>
+
+<ul>
+{% for s in creneaux %}
+<li>{{ s.date }}
+	{% if s.alieu %}
+		organis&eacute; par <span>{{ s.org|title }}</span>, participants <span>{{ s.presents|title }}</span>
+		{% if s.comments is iterable %}
+			{% for c in s.comments %}
+				<p>{{ c.note|e }}</p>
+			{% endfor %}
+		{% endif %}
+	{% else %}
+		Annul&eacute;e{% if s.note %}: {{ s.note }}{% endif %}
+	{% endif %}
+{% endfor %}
+</ul>
+
+{% endblock %}
