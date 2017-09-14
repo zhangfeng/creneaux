@@ -2,6 +2,7 @@ import sqlite3
 from flask import Flask, session, render_template, g, Response, request, url_for, redirect
 from hashlib import sha1
 import datetime
+import os
 
 # DATABASE = '/home/emmanuel/creneaux/creneaux.db'
 DATABASE = 'creneaux.db'
@@ -29,11 +30,66 @@ def sub_presence(a,b):
         return ",".join(sorted([x for x in a.split(",") if x.lower() != b.lower()]))
 
 def connect_db():
+    db_exists = os.path.exists(app.config['DATABASE'])
     db = sqlite3.connect(app.config['DATABASE'])
     db.row_factory = sqlite3.Row
     db.create_function("add_presence", 2, add_presence)
     db.create_function("sub_presence", 2, sub_presence)
+    if not db_exists:
+        create_db_struct(db)
     return db
+
+def create_db_struct(db):
+    """ Create the basics for the database """
+    stmts = [
+            'drop table if exists users',
+            'drop table if exists sessions',
+            'drop table if exists comments',
+            'drop table if exists roles',
+            'drop table if exists proposals',
+            """
+create table users(
+	name TEXT,
+	passwd TEXT,
+	email TEXT,
+	role INTEGER,
+	id INTEGER PRIMARY KEY AUTOINCREMENT
+)
+            """,
+            """
+create table roles(
+	name TEXT,
+	id INTEGER PRIMARY KEY
+)
+            """,
+            """
+create table sessions(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	date DATE,
+	org INT,
+	presents TEXT
+)
+            """,
+            """
+create table comments(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	session INTEGER,
+	note TEXT
+)
+            """,
+            """
+create table proposals(
+	date DATE,
+	org INT
+)
+            """,
+            """
+insert into roles (name, id) VALUES
+	('administrateur', 0),
+	('utilisateur', 1);
+            """
+            ]
+    pass # TODO
 
 def check_auth(user, passwd):
     sh_pass = sha1(passwd).hexdigest()
