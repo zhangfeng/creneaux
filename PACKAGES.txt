@@ -1,0 +1,7 @@
+Python packages to install:
+
+flask
+flask-sqlalchemy
+flask-wtf
+flask-migrate
+flask-login
