@@ -198,9 +198,10 @@ def sessionsSupprime(sid):
 
 @app.route("/login", methods=['POST'])
 def login():
-    if hasattr(request, "form") and check_auth(request.form['username'], request.form['passwd']):
-        session['username'] = request.form['username']
-    return redirect(url_for('sessionsList'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        return redirect(url_for('sessionsList'))
+    return redirect(url_for('index'))
 
 @app.route("/logout")
 def logout():
