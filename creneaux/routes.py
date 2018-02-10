@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect, url_for
 from creneaux import app
+from creneaux.forms import LoginForm
 
 @app.route("/")
 def index():
