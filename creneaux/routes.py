@@ -1,6 +1,8 @@
 from flask import render_template, flash, redirect, url_for
 from creneaux import app
 from creneaux.forms import LoginForm
+from creneaux.models import User
+from flask_login import current_user, login_user
 
 @app.route("/")
 def index():
@@ -199,8 +201,15 @@ def sessionsSupprime(sid):
 
 @app.route("/login", methods=['POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('sessionsList'))
     form = LoginForm()
     if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash('Utilisateur ou mot de passe invalide')
+            return redirect(url_for('index'))
+        login_user(user, remember=form.remember.data)
         return redirect(url_for('sessionsList'))
     return redirect(url_for('index'))
 
