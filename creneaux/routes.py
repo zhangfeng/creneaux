@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for
 from creneaux import app
 from creneaux.forms import LoginForm
 from creneaux.models import User
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user
 
 @app.route("/")
 def index():
@@ -215,8 +215,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    if 'username' in session:
-        del session['username']
+    logout_user()
     return redirect(url_for('index'))
 
 @app.route("/users/list")
